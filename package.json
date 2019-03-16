@@ -1,0 +1,30 @@
+{
+  "name": "y-prompt",
+  "version": "1.0.0",
+  "description": "A configurable terminal prompter for nodejs.",
+  "main": "YPrompt.js",
+  "scripts": {
+    "test": "test_prompt.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yorgsite/y-prompt.git"
+  },
+  "keywords": [
+    "nodejs",
+    "node",
+    "terminal",
+    "prompt",
+    "form",
+    "console"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yorgsite/y-prompt/issues"
+  },
+  "homepage": "https://github.com/yorgsite/y-prompt#readme",
+  "dependencies": {
+    "node-styl": "0.0.3"
+  }
+}
