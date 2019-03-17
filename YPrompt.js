@@ -251,7 +251,11 @@ YP.Prompter=function(parent){
 		}
 	};
 	check.arg=function(caller,type,argName,argValue){
-		if(!(argValue+'').length||typeof(argValue)!==type){
+		var argType=typeof(argValue);
+		var valid=(argValue+'').length&&
+			((type instanceof Array)?
+			type.indexOf(argType)>-1:argType===type);
+		if(!valid){
 			throw(check.argErr(caller,argName,argValue,"must be of type '"+type+"'"));
 		}
 	};
@@ -412,13 +416,18 @@ YP.Prompter=function(parent){
 	*/
 	this.askLoop=function(varName,nbLoop,collector){
 		check.arg('askLoop','string','varName',varName);
+		// check.arg('askLoop',['number','function'],'nbLoop',nbLoop);
 		check.arg('askLoop','number','nbLoop',nbLoop);
 		check.arg('askLoop','function','collector',collector);
-		if(nbLoop<1){
-			throw(check.argErr('askLoop','nbLoop',nbLoop,"must be >= 1 "));
+		if(typeof(nbLoop)==='number'){
+			if(nbLoop<1){
+				throw(check.argErr('askLoop','nbLoop',nbLoop,"must be >= 1 "));
+			}
 		}
 		var lid=0;
-		return this.askWhile(varName,()=>nbLoop>lid++,collector);
+		return typeof(nbLoop)==='function'?
+			this.askWhile(varName,(dat,loc)=>nbLoop()>lid++,collector):
+			this.askWhile(varName,()=>nbLoop>lid++,collector);
 	};
 	/**
 	Starts the prompt session.<br/>
@@ -433,7 +442,7 @@ YP.Prompter=function(parent){
 	build();
 };
 
-YP.Session=function(iblock){
+YP.Session=function(prompter){
 	var scope=this;
 	var build=function(){
 
@@ -446,10 +455,10 @@ YP.Session=function(iblock){
 	};
 	var run=function(then,fail){
 		run.start();
-		new YP.Session.Block(bridge,iblock,function(datas){
+		new YP.Session.Block(bridge,prompter,function(datas){
 			run.stop();
 			then(datas);
-		},fail);
+		},fail,0);
 	};
 	run.start=function(then,fail){
 		process.stdin.setEncoding('utf8');
@@ -466,14 +475,14 @@ YP.Session=function(iblock){
 	// process.stdin.removeListener('data',on_input);
 	build();
 };
-YP.Session.Block=function(bridge,iblock,onDone,onFail){
+YP.Session.Block=function(bridge,prompter,onDone,onFail,parentData){
 	var scope=this;
 	var list,id=0,datas={},cres=0;
 	var build=function(){
 		if(!bridge.datas){
 			bridge.datas=datas;
 		}
-		list=iblock.collection;
+		list=prompter.collection;
 		build.step();
 	};
 	build.step=function(){
@@ -503,19 +512,22 @@ YP.Session.Block=function(bridge,iblock,onDone,onFail){
 		build.block(obj);
 	};
 	build.block=function(obj){
-		// console.log('iblock = ',iblock);cres
+		// console.log('prompter = ',prompter);cres
 		if((cres=obj.condition(bridge.datas,datas))){
-			var subblock=new YP.Prompter(iblock);
+			var subblock=new YP.Prompter(prompter);
 			obj.collector(subblock,bridge.datas,datas);
 			if(obj.b_type==='while'){
 				new YP.Session.Block(bridge,subblock,(dat)=>{
 					datas[obj.varName].push(dat);
 					id--;
 					build.next();
-				},onFail);
+				},onFail,datas);
 			}else {
 				while(id<list.length-1&&['elseIf','else'].indexOf(list[id+1].b_type)>-1){
 					id++;
+				}
+				if(obj.varName){
+					datas[obj.varName]={};
 				}
 				new YP.Session.Block(bridge,subblock,(dat)=>{
 					if(obj.varName){

@@ -8,6 +8,7 @@ YPrompt.baseTypes();
 YPrompt.prompter()
 
 .log(datas=>'\n--------- Starting prompt ---------\n')
+.log(datas=>'You can cancel with Ctrl+C at any moment.\n')
 
 .ask('number','numvalue','choose a number',{defaultValue:'1'})
 .ask('varName','rootName','root name of your data')
@@ -33,8 +34,8 @@ YPrompt.prompter()
 	.log(datas=>'- Choose 3 numbers :')
 	.askLoop('number_list',3,function(lprompter,datas,localDatas){
 		lprompter
-		.log(datas=>'- item['+datas.number_list.length+1+'] / 3')
-		.ask('number','value','  - Enter number',{defaultValue:datas=>datas.number_list.length+1});
+		.log(datas=>'- item['+(localDatas.number_list.length+1)+'] / 3')
+		.ask('number','value','  - Enter number',{defaultValue:datas=>localDatas.number_list.length+1});
 	})
 })
 
@@ -42,7 +43,7 @@ YPrompt.prompter()
 
 .start()
 .then(function(res){
-	console.log('\nfinished result=',res);
+	console.log('\nfinished result=',JSON.stringify(res));
 	process.exit();
 });
 ;

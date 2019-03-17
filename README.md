@@ -37,7 +37,13 @@ As your questions and process the result:
 	});
 ```
 <br/>
-A more elabored exemple can be found in **[test_prompt.js](test_prompt.js)**.
+A more elabored exemple can be found in **[test_prompt.js](test_prompt.js)**.<br/>
+Launch test locally:
+
+```
+node test_prompt
+```
+
 <hr/>
 
 ## <a name="tg_menu"></a> Menu
@@ -155,6 +161,19 @@ The first step is to create a new prompter.
 Use the prompter to prepare your questions and get the result.<br/>
 NB: All the prompter actions ar chainables except 'start'.
 
++ [Basics](#tg_basics).
+	+ [prompter.log](#tg_log).
+	+ [prompter.ask](#tg_ask).
++ [Conditionnals](#tg_conditions).
+	+ [prompter.askIf](#tg_askIf).
+	+ [prompter.elseIf](#tg_elseIf).
+	+ [prompter.else](#tg_else).
++ [Loops](#tg_loops).
+	+ [prompter.askWhile](#tg_askWhile).
+	+ [prompter.askLoop](#tg_askLoop).
++ [Loops](#tg_result).
+	+ [prompter.start](#tg_start).
+
 <hr/>
 
 ### <a name="tg_basics"></a>Prompter basics.
@@ -162,6 +181,8 @@ NB: All the prompter actions ar chainables except 'start'.
 <hr/>
 
 #### <a name="tg_log"></a> prompter.log
+
+Log a message between quesions.
 
 ```javascript
 	/**
@@ -175,6 +196,8 @@ NB: All the prompter actions ar chainables except 'start'.
 <hr/>
 
 #### <a name="tg_ask"></a> prompter.ask
+
+Ask a question.
 
 ```javascript
 	/**
@@ -196,6 +219,8 @@ NB: All the prompter actions ar chainables except 'start'.
 
 #### <a name="tg_askIf"></a> prompter.askIf
 
+adds a conditionnal prompter.
+
 ```javascript
 	/**
 	adds a conditionnal prompter.
@@ -216,6 +241,8 @@ NB: All the prompter actions ar chainables except 'start'.
 <hr/>
 
 #### <a name="tg_elseIf"></a> prompter.elseIf
+
+adds a conditionnal prompter if preceeding conditions are not ok.
 
 ```javascript
 	/**
@@ -239,9 +266,11 @@ NB: All the prompter actions ar chainables except 'start'.
 
 #### <a name="tg_else"></a> prompter.else
 
+adds a prompter if preceeding conditions are not ok.
+
 ```javascript
 	/**
-	adds a condition if preceeding conditions are not ok.<br/>
+	adds a prompter if preceeding conditions are not ok.<br/>
 	can be only called after askIf or elseIf.
 	@param {string} varName : data property to witch the  the resulting object will be assigned.<br/>
 	If not a string, resulting object properties are directky applied to the parent object.
@@ -262,6 +291,8 @@ NB: All the prompter actions ar chainables except 'start'.
 
 #### <a name="tg_askWhile"></a> prompter.askWhile
 
+Calls for prompters while condition is ok.
+
 ```javascript
 	/**
 	Calls for collector while condition is ok. Creates an array of objects.<br/>
@@ -281,6 +312,8 @@ NB: All the prompter actions ar chainables except 'start'.
 <hr/>
 
 #### <a name="tg_askLoop"></a> prompter.askLoop
+
+Calls for prompters a number of times.
 
 ```javascript
 /**
