@@ -154,7 +154,7 @@ You can change the appearance of the prompt by changing the configuration styles
 The first step is to create a new prompter.
 
 ```javascript
-	// ... must init types before
+	// ... dont forget to init types before
 	// ...
 	var prompter=Prompt.prompter();
 
