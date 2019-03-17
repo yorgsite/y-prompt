@@ -25,14 +25,19 @@ var YPrompt=new function(){
 	};
 
 	/**
-	@param {string} name :
-	@param {function(input,onError)} check : return true if input is valid, else call onError.<br/>
+	Add a new question type.
+	@param {string} name : the type name.
+	@param {function(inpt,onError,params)} check : return true if input is valid, else call onError.<br/>
 	- {string} input : the current entry value<br/>
-	- {function} onError : call to send an error message<br/>
-	@param {function} transform :
-	@param {any} [defaultValue] :
+	- {function(message)} onError : Call to send an error message when the input is invalid.<br/>
+	- {object} params : The parameters you may add to a quetion.<br/>
+	@param {function(input,params)} transform :
+	- {string} input : the current entry value<br/>
+	- {object} params : The parameters you may add to a quetion.<br/>
+	@param {string} [parentType] : inherits its behaviour from a parent type if 'parentType' is defined. The parent will check and transform the data before passing it to the child method
+	@param {any} [defaultValue] : defines a default value. Its use is deprecated since it remove the possibility to make the answer mandatory.
 	*/
-	this.addType=function(name,check,transform,defaultValue,parentType){
+	this.addType=function(name,check,transform,parentType,defaultValue){
 		var params={
 			check:check,
 			transform:transform,
@@ -43,6 +48,10 @@ var YPrompt=new function(){
 		}
 		YP.types[name]=new YP.Type(name,params);
 	};
+	/**
+
+	@retun a new Prompter
+	*/
 	this.prompter=function(){
 		return new YP.Prompter();
 	};
@@ -83,7 +92,8 @@ YP.Config=function(){
 		}
 	};
 	build.style=function(name,prox,stylProxy){
-		io.styles[name]=new YP.Config.Style(data.styles[name]);
+		io.styles[name]=new YP.Config.Style();
+		io.styles[name].setValue(data.styles[name]);
 		Object.defineProperty(prox,name,{
 			get:()=>io.styles[name],
 			set:(v)=>io.styles[name].setValue(v)
@@ -94,7 +104,7 @@ YP.Config=function(){
 	};
 	build();
 };
-YP.Config.Style=function(pile){
+YP.Config.Style=function(){
 	var scope=this;
 	var ref={
 		front:['white','grey','black','blue','cyan','green','magenta','red','yellow'],
@@ -120,7 +130,7 @@ YP.Config.Style=function(pile){
 			pile.forEach(v=>_styl[v]);
 			return _styl.text;
 		}});
-		scope.setValue(pile);
+
 	};
 	build.proxy=function(){
 		proxy=new Proxy({},{
@@ -198,7 +208,7 @@ YP.Type=function(name,params){
 		if(typeof(params.transform)==='function'){
 			options.transform=params.transform;
 		}else {
-			options.transform=function(input,onResult){return input;};
+			options.transform=function(input){return input;};
 		}
 		options.hasDefault=typeof(params.defaultValue)!=='undefined';
 		if(options.hasDefault){
@@ -214,14 +224,8 @@ YP.Type=function(name,params){
 					return options.check(input,onError,params);
 				}
 			};
-			scope.transform=function(input,onResult,params){
-				var on_result=function(res){
-					return options.transform(res,onResult,params);
-				};
-				var res=params.parent.transform(input,on_result,params);
-				if(typeof(res)!=='undefined'){
-					return on_result(res);
-				}
+			scope.transform=function(input,params){
+				params.parent.transform(input,params);
 			};
 		}else{
 			scope.check=options.check;
@@ -243,7 +247,7 @@ YP.Prompter=function(parent){
 	};
 	check.else=function(caller){
 		if(!collection.length||beforeElse.indexOf(collection[collection.length-1].b_type)===-1){
-			throw("Prompter."+caller+" Error: can be only called after askIf or askElseIf.");
+			throw("Prompter."+caller+" Error: can be only called after askIf or elseIf.");
 		}
 	};
 	check.arg=function(caller,type,argName,argValue){
@@ -277,6 +281,11 @@ YP.Prompter=function(parent){
 		return scope;
 	};
 
+	/**
+	Log a message between quesions.
+	@param {string} message : will be logged to the console in time.
+	@return {Prompter} the current prompter.
+	*/
 	this.log=function(message){
 		var obj={
 			b_type:'log',
@@ -285,6 +294,15 @@ YP.Prompter=function(parent){
 		collection.push(obj);
 		return this;
 	};
+
+	/**
+	Ask a question.
+	@param {string} type : the name of the type used for the question.
+	@param {string} varName : the name of the data property to witch the result will be assigned.
+	@param {string} message : the question you want to ask.
+	@param {object} [params] : specific questions parameters.<br/>
+	@return {Prompter} the current prompter.
+	*/
 	this.ask=function(type,varName,message,params){
 		if(type in YP.types){
 			check.arg('ask','string','varName',varName);
@@ -303,23 +321,72 @@ YP.Prompter=function(parent){
 			//error
 		}
 	};
+	/**
+	adds a conditionnal prompter.
+	@param {string} varName : data property to witch the  the resulting object will be assigned.<br/>
+	If not a string, resulting object properties are directky applied to the parent object.
+	@param {function(datas,localDatas)} condition : return true when condition ok.<br/>
+	- {object} datas : The current global datas.<br/>
+	- {object} localDatas : The current prompter datas.<br/>
+	@param {function(prompter,datas,localDatas)} collector : calls for a new collector if condition ok.<br/>
+	- {Prompter} prompter : the prompter used to collect new questions.<br/>
+	- {object} datas : The current global datas.<br/>
+	- {object} localDatas : The local prompter datas.<br/>
+	@return {Prompter} the current prompter.
+	*/
 	this.askIf=function(varName,condition,collector){
 		check.arg('askIf','function','condition',condition);
 		check.arg('askIf','function','collector',collector);
 		return addBlock('block',varName,condition,collector);
 	};
+	/**
+	adds a conditionnal prompter if preceeding conditions are not ok.<br/>
+	can be only called after askIf or elseIf.
+	@param {string} varName : data property to witch the  the resulting object will be assigned.<br/>
+	If not a string, resulting object properties are directky applied to the parent object.
+	@param {function(datas,localDatas)} condition : return true when condition ok.<br/>
+	- {object} datas : The current global datas.<br/>
+	- {object} localDatas : The current prompter datas.<br/>
+	@param {function(prompter,datas,localDatas)} collector : calls for a new collector if condition ok.<br/>
+	- {Prompter} prompter : the prompter used to collect new questions.<br/>
+	- {object} datas : The current global datas.<br/>
+	- {object} localDatas : The local prompter datas.<br/>
+	@return {Prompter} the current prompter.
+	*/
 	this.elseIf=function(varName,condition,collector){
 		check.else('elseIf');
 		check.arg('elseIf','function','condition',condition);
 		check.arg('elseIf','function','collector',collector);
 		return addBlock('elseIf',varName,condition,collector);
 	};
+	/**
+	adds a condition if preceeding conditions are not ok.<br/>
+	can be only called after askIf or elseIf.
+	@param {string} varName : data property to witch the  the resulting object will be assigned.<br/>
+	If not a string, resulting object properties are directky applied to the parent object.
+	@param {function(prompter,datas,localDatas)} collector : calls for a new collector if condition ok.<br/>
+	- {Prompter} prompter : the prompter used to collect new questions.<br/>
+	- {object} datas : The current global datas.<br/>
+	- {object} localDatas : The local prompter datas.<br/>
+	@return {Prompter} the current prompter.
+	*/
 	this.else=function(varName,collector){
 		check.else('else');
 		check.arg('else','function','collector',collector);
 		return addBlock('else',varName,()=>1,collector);
 	};
-	// data is an array
+	/**
+	Calls for collector while condition is ok. Creates an array of objects.<br/>
+	@param {string} varName : data property to witch the  the resulting array will be assigned.<br/>
+	@param {function(datas,localDatas)} condition : return true when condition ok.<br/>
+	- {object} datas : The current global datas.<br/>
+	- {object} localDatas : The current prompter datas.<br/>
+	@param {function(prompter,datas,localDatas)} collector : calls for a new collector eatch time condition ok.<br/>
+	- {Prompter} prompter : the prompter used to collect new questions.<br/>
+	- {object} datas : The current global datas.<br/>
+	- {object} localDatas : The local prompter datas.<br/>
+	@return {Prompter} the current prompter.
+	*/
 	this.askWhile=function(varName,condition,collector){
 		check.arg('askWhile','string','varName',varName);
 		check.arg('askWhile','function','condition',condition);
@@ -333,6 +400,16 @@ YP.Prompter=function(parent){
 		collection.push(obj);
 		return this;
 	};
+	/**
+	Calls for collector 'nbLoop' times. Creates an array of objects.<br/>
+	@param {string} varName : data property to witch the  the resulting array will be assigned.<br/>
+	@param {number>0} nbLoop : the size of the returned array.<br/>
+	@param {function(prompter,datas,localDatas)} collector : calls for a new collector 'nbLoop' times.<br/>
+	- {Prompter} prompter : the prompter used to collect new questions.<br/>
+	- {object} datas : The current global datas.<br/>
+	- {object} localDatas : The local prompter datas.<br/>
+	@return {Prompter} the current prompter.
+	*/
 	this.askLoop=function(varName,nbLoop,collector){
 		check.arg('askLoop','string','varName',varName);
 		check.arg('askLoop','number','nbLoop',nbLoop);
@@ -343,6 +420,11 @@ YP.Prompter=function(parent){
 		var lid=0;
 		return this.askWhile(varName,()=>nbLoop>lid++,collector);
 	};
+	/**
+	Starts the prompt session.<br/>
+	Does not return a prompter. Call only when all qustions are asked.
+	@return {Promise} a promise flushed with the resulting datas when all questions are answered.
+	*/
 	this.start=function(){
 		return parent?parent.start():new YP.Session(scope).run();
 	};
@@ -512,11 +594,11 @@ YP.Session.Line=function(bridge,obj,onDone,onFail){
 	on.imput=function(text){
 		logs.writeOff(text);
 		if(!text.length&&hasdef){
-			var data=type.transform(dval,function(dat){},obj.params);
+			var data=type.transform(dval,obj.params);
 			on.finish(dval);
 			onDone(data);
 		}else if(type.check(text,on.error,obj.params)){
-			var data=type.transform(text,function(dat){},obj.params);
+			var data=type.transform(text,obj.params);
 			on.finish(text);
 			onDone(data);
 		}

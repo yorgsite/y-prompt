@@ -35,19 +35,24 @@ module.exports=function(YPrompt){
 	YP.Lists.get_numeric=(parser)=>((inpt)=>inpt.split(',').map(txt=>parser(txt)));
 
 	// -------------------------
-
+	/**
+	gets a 'y' (for Yes) or 'n' (for No) answer as a boolean
+	*/
 	YPrompt.addType('yn',
 		function(inpt,onerr,params){//check
 			if(['n','y'].indexOf(inpt.toLowerCase())>-1){
 				return 1;
 			}else{
-				onerr(`'${inpt}' is not a valid yn answer, accepted are 'y' for yes or 'n' for no.`);
+				onerr(`'${inpt}' is not a valid answer, accepted are 'y' for yes or 'n' for no.`);
 			}
 
 		},
-		function(inpt,onres){return !!(['n','y'].indexOf(inpt.toLowerCase()));}//transform gets boolean
+		function(inpt){return !!(['n','y'].indexOf(inpt.toLowerCase()));}//transform gets boolean
 	);
 
+	/**
+	gets a numeric answer as a number
+	*/
 	YPrompt.addType('number',
 		function(inpt,onerr,params){//check
 			var num=parseFloat(inpt);
@@ -63,9 +68,12 @@ module.exports=function(YPrompt){
 			}
 
 		},
-		function(inpt,onres){return parseFloat(inpt);}//transform
+		function(inpt){return parseFloat(inpt);}//transform
 	);
 
+	/**
+	gets a numeric integer answer as an integer
+	*/
 	YPrompt.addType('int',
 		function(inpt,onerr,params){//check
 			var num=parseInt(inpt);
@@ -81,9 +89,12 @@ module.exports=function(YPrompt){
 			}
 
 		},
-		function(inpt,onres){return parseInt(inpt);}//transform
+		function(inpt){return parseInt(inpt);}//transform
 	);
 
+	/**
+	gets a var name answer as a string
+	*/
 	YPrompt.addType('varName',
 		function(inpt,onerr,params){//check
 			var reg = /^[A-Za-z][A-Za-z0-9]*$/;
@@ -94,9 +105,12 @@ module.exports=function(YPrompt){
 			}
 
 		},
-		function(inpt,onres){return inpt;}//transform
+		function(inpt){return inpt;}//transform
 	);
 
+	/**
+	gets a var name splitted with at least one '-' answer as a string
+	*/
 	YPrompt.addType('-varName',
 		function(inpt,onerr,params){//check
 			var reg = /^[A-Za-z][A-Za-z0-9]+[\-][A-Za-z0-9\-]+[A-Za-z0-9]*$/;
@@ -107,9 +121,12 @@ module.exports=function(YPrompt){
 			}
 
 		},
-		function(inpt,onres){return inpt;}//transform
+		function(inpt){return inpt;}//transform
 	);
 
+	/**
+	gets a file name answer as a string
+	*/
 	YPrompt.addType('fileName',
 		function(inpt,onerr,params){//check
 			var reg = /^[A-Za-z0-9_+\-\.]*$/;
@@ -120,10 +137,13 @@ module.exports=function(YPrompt){
 			}
 
 		},
-		function(inpt,onres){return inpt;}//transform
+		function(inpt){return inpt;}//transform
 	);
 
 	// ------------------- specials
+	/**
+	gets a json answer as an object
+	*/
 	YPrompt.addType('json',
 		function(inpt,onerr,params){//check
 			try{
@@ -133,7 +153,7 @@ module.exports=function(YPrompt){
 				onerr(`'${inpt}' is not a valid JSON`);
 			}
 		},
-		function(inpt,onres){return JSON.parse(inpt);}//transform
+		function(inpt){return JSON.parse(inpt);}//transform
 	);
 	//var asFunc = new Function(customJSfromServer);
 	// var expression = 'return 2+2+2;'
@@ -141,19 +161,28 @@ module.exports=function(YPrompt){
 
 	// ------------------- lists
 
+	/**
+	gets a list of var names splitted bay ',' answer as an array
+	*/
 	YPrompt.addType('varNameList',
 		function(inpt,onerr,params){//check
 			var reg = /^[A-Za-z][A-Za-z0-9]*$/;
 			return YP.Lists.test('varNames',txt=>txt.match(reg),inpt,onerr,params);
 		},
-		function(inpt,onres){return inpt.split(',');}//transform
+		function(inpt){return inpt.split(',');}//transform
 	);
+	/**
+	gets a list of numbers splitted bay ',' answer as an array
+	*/
 	YPrompt.addType('numberList',
 		function(inpt,onerr,params){//check
 			return YP.Lists.test_numeric('numberList',parseFloat,inpt,onerr,params);
 		},
 		YP.Lists.get_numeric(parseFloat)//transform
 	);
+	/**
+	gets a list of integers splitted bay ',' answer as an array
+	*/
 	YPrompt.addType('intList',
 		function(inpt,onerr,params){//check
 			return YP.Lists.test_numeric('intList',parseInt,inpt,onerr,params);
