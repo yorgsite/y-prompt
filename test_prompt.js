@@ -1,6 +1,8 @@
 const styl=require('node-styl');
 
 const YPrompt=require('./YPrompt.js');
+//const YPrompt=require('y-prompt');
+
 
 YPrompt.config.style.varName='green';
 YPrompt.baseTypes();

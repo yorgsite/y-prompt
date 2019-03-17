@@ -45,9 +45,10 @@ As your questions and process the result:
 
 A more elabored exemple can be found in **[test_prompt.js](test_prompt.js)** .<br/>
 
-Launch test locally:
+Launch demo :
 
 ```
+cd node_modules/y-prompt
 node test_prompt
 ```
 
