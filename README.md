@@ -7,6 +7,7 @@ npm install y-prompt
 ```
 <br/>
 As your questions and process the result:
+
 ```javascript
 	const Prompt=require('./y-prompt');
 	// use predefined types
