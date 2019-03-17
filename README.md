@@ -36,8 +36,10 @@ As your questions and process the result:
 		process.exit();
 	});
 ```
+
 <br/>
-A more elabored exemple can be found in **[test_prompt.js](test_prompt.js)**.<br/>
+
+A more elabored exemple can be found in **[test_prompt.js](test_prompt.js)** .<br/>
 Launch test locally:
 
 ```
