@@ -1,6 +1,6 @@
 {
   "name": "y-prompt",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A configurable terminal prompter for nodejs.",
   "main": "YPrompt.js",
   "scripts": {

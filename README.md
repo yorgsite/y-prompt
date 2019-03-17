@@ -1,11 +1,15 @@
 # y-prompt
+
 A configurable terminal prompter for nodejs.
 
 Install :
+
 ```
 npm install y-prompt
 ```
+
 <br/>
+
 As your questions and process the result:
 
 ```javascript
@@ -40,6 +44,7 @@ As your questions and process the result:
 <br/>
 
 A more elabored exemple can be found in **[test_prompt.js](test_prompt.js)** .<br/>
+
 Launch test locally:
 
 ```
