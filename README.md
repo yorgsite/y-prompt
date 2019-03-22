@@ -71,7 +71,7 @@ node test_prompt
 	+ [Loops](#tg_loops).
 		+ [prompter.askWhile](#tg_askWhile).
 		+ [prompter.askLoop](#tg_askLoop).
-	+ [Loops](#tg_result).
+	+ [Get the result](#tg_result).
 		+ [prompter.start](#tg_start).
 + [Exemples](#tg_exemples).
 	+ [base types](YPrompt.baseTypes.js).
@@ -179,7 +179,7 @@ NB: All the prompter actions ar chainables except 'start'.
 + [Loops](#tg_loops).
 	+ [prompter.askWhile](#tg_askWhile).
 	+ [prompter.askLoop](#tg_askLoop).
-+ [Loops](#tg_result).
++ [Get the result](#tg_result).
 	+ [prompter.start](#tg_start).
 
 <hr/>

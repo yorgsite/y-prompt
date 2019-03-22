@@ -417,16 +417,24 @@ YP.Prompter=function(parent){
 	this.askLoop=function(varName,nbLoop,collector){
 		check.arg('askLoop','string','varName',varName);
 		// check.arg('askLoop',['number','function'],'nbLoop',nbLoop);
-		check.arg('askLoop','number','nbLoop',nbLoop);
 		check.arg('askLoop','function','collector',collector);
+		let checkNb=(nb)=>{
+			if(typeof(nb)!=='number')throw(check.argErr('askLoop','nbLoop',nb,"must be or return a number "));
+			if(nb<1)throw(check.argErr('askLoop','nbLoop',nb,"must be or return a number >= 1 "));
+			return nb;
+		};
+		var lid=0,looper;
 		if(typeof(nbLoop)==='number'){
-			if(nbLoop<1){
-				throw(check.argErr('askLoop','nbLoop',nbLoop,"must be >= 1 "));
-			}
+			checkNb(nbLoop);
+			looper=()=>nbLoop>lid++;
+		}else if(typeof(nbLoop)==='function'){
+			looper=(dat,loc)=>checkNb(nbLoop(dat,loc))>lid++;
+		}else{
+			throw(check.argErr('askLoop','nbLoop',nbLoop,"must be of type number or function."));
 		}
 		var lid=0;
 		return typeof(nbLoop)==='function'?
-			this.askWhile(varName,(dat,loc)=>nbLoop()>lid++,collector):
+			this.askWhile(varName,(dat,loc)=>nbLoop(dat,loc)>lid++,collector):
 			this.askWhile(varName,()=>nbLoop>lid++,collector);
 	};
 	/**
@@ -504,7 +512,7 @@ YP.Session.Block=function(bridge,prompter,onDone,onFail,parentData){
 		build.block(obj);
 	};
 	build.log=function(obj){
-		console.log((typeof(obj.msg)==='function'?obj.msg(bridge.datas):obj.msg)+'');
+		console.log((typeof(obj.msg)==='function'?obj.msg(bridge.datas,datas):obj.msg)+'');
 		build.next();
 	};
 	build.while=function(obj){

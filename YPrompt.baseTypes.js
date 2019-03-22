@@ -61,8 +61,9 @@ module.exports=function(YPrompt){
 					onerr(`${num} is < ${params.min}`);
 				}else if(typeof(params.max)==='number'&&num>params.max){
 					onerr(`${num} is > ${params.max}`);
+				}else{
+					return 1;
 				}
-				return 1;
 			}else{
 				onerr(`'${inpt}' is not a valid number`);
 			}
@@ -82,8 +83,9 @@ module.exports=function(YPrompt){
 					onerr(`${num} is < ${params.min}`);
 				}else if(typeof(params.max)==='number'&&num>params.max){
 					onerr(`${num} is > ${params.max}`);
+				}else{
+					return 1;
 				}
-				return 1;
 			}else{
 				onerr(`'${inpt}' is not a valid number`);
 			}
@@ -141,6 +143,20 @@ module.exports=function(YPrompt){
 	);
 
 	// ------------------- specials
+	YPrompt.addType('enum',
+		function(inpt,onerr,params){//check
+			if(typeof(params)!=='object'||!(params.list instanceof Array)||!params.list.length){
+				throw('prompt enum error:params.list must be a non empty array')
+			}
+			if(inpt.length&&params.list.indexOf(inpt)>-1){
+				return 1;
+			}else{
+				onerr(`'${inpt}' is not a valid answer, accepted are : [${params.list}].`);
+			}
+
+		},
+		function(inpt){return inpt;}//transform
+	);
 	/**
 	gets a json answer as an object
 	*/
