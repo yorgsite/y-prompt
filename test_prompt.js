@@ -33,7 +33,7 @@ YPrompt.prompter()
 	prompter
 	.log(dat=>'First number '+dat.numvalue+' was == 0 .')
 
-	.ask('number','listSize','How many items in the list [1-10] ?',{min:1,max:10})
+	.ask('int','listSize','How many items in the list [1-10] ?',{min:1,max:10})
 
 	.log((dat,local)=>'- Choose '+local.listSize+' numbers :')
 

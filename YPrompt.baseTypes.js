@@ -143,10 +143,14 @@ module.exports=function(YPrompt){
 	);
 
 	// ------------------- specials
+	/**
+	gets an answer from a list of choices
+	*/
 	YPrompt.addType('enum',
 		function(inpt,onerr,params){//check
 			if(typeof(params)!=='object'||!(params.list instanceof Array)||!params.list.length){
-				throw('prompt enum error:params.list must be a non empty array')
+				console.log('params=',params);
+				throw('Prompt enum error: params.list must be a non empty array');
 			}
 			if(inpt.length&&params.list.indexOf(inpt)>-1){
 				return 1;
