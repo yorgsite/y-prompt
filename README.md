@@ -87,7 +87,7 @@ The types definitions is the root feature of 'y-prompt'. This is where you defin
 
 ### <a name="tg_basetypes"></a> Base types.
 
-On your first uses, you may want to use 'y-prompt' [base types](YPrompt.baseTypes.js) instead before defining your owns (in this case go directly to [Prompt for datas](#tg_prompt)), or you may simply use them whith yours.<br/>
+On your first uses, you may want to use 'y-prompt' [base types](YPrompt.baseTypes.js) instead before defining your owns (in this case go directly to [Make a prompter](#tg_prompt)), or you may simply use them whith yours.<br/>
 
 ```javascript
 	// ...
