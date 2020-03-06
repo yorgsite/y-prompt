@@ -10,10 +10,10 @@ npm install y-prompt
 
 <br/>
 
-As your questions and process the result:
+Ask your questions and process the result:
 
 ```javascript
-	const Prompt=require('./y-prompt');
+	const Prompt=require('y-prompt');
 	// use predefined types
 	Prompt.baseTypes();
 	// --- prompt your questions
@@ -111,13 +111,13 @@ define a new type with **Prompt.addType**:
 	- {string} input : the current entry value<br/>
 	- {function(message)} onError : Call to send an error message when the input is invalid.<br/>
 	- {object} params : The parameters you may add to a quetion.<br/>
-	@param {function(input,params)} transform :
+	@param {function(input,params)} transform : return the data corresponding to 'input'.
 	- {string} input : the current entry value<br/>
 	- {object} params : The parameters you may add to a quetion.<br/>
 	@param {string} [parentType] : inherits its behaviour from a parent type if 'parentType' is defined. The parent will check and transform the data before passing it to the child method
 	@param {any} [defaultValue] : defines a default value. Its use is deprecated since it remove the possibility to make the answer mandatory.
 	*/
-	Prompt.addType(name,check,transform,defaultValue,parentType);
+	Prompt.addType(name,check,transform,parentType,defaultValue);
 ```
 
 <br/>
@@ -327,7 +327,7 @@ Calls for prompters a number of times.
 /**
 	Calls for collector 'nbLoop' times. Creates an array of objects.<br/>
 	@param {string} varName : data property to witch the  the resulting array will be assigned.<br/>
-	@param {number>0} nbLoop : the size of the returned array.<br/>
+	@param {number>0|function} nbLoop : is or returns the size of the resulting array.<br/>
 	@param {function(prompter,datas,localDatas)} collector : calls for a new collector 'nbLoop' times.<br/>
 	- {Prompter} prompter : the prompter used to collect new questions.<br/>
 	- {object} datas : The current global datas.<br/>

@@ -175,9 +175,6 @@ module.exports=function(YPrompt){
 		},
 		function(inpt){return JSON.parse(inpt);}//transform
 	);
-	//var asFunc = new Function(customJSfromServer);
-	// var expression = 'return 2+2+2;'
-	// var result = eval('(function() {' + expression + '}())');
 
 	// ------------------- lists
 

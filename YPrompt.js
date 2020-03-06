@@ -31,7 +31,7 @@ var YPrompt=new function(){
 	- {string} input : the current entry value<br/>
 	- {function(message)} onError : Call to send an error message when the input is invalid.<br/>
 	- {object} params : The parameters you may add to a quetion.<br/>
-	@param {function(input,params)} transform :
+	@param {function(input,params)} transform : return the data corresponding to 'input'.
 	- {string} input : the current entry value<br/>
 	- {object} params : The parameters you may add to a quetion.<br/>
 	@param {string} [parentType] : inherits its behaviour from a parent type if 'parentType' is defined. The parent will check and transform the data before passing it to the child method
