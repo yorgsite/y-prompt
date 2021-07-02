@@ -41,7 +41,7 @@ YPrompt.prompter()
 		lprompter
 		.log(dat=>'- item['+(localDatas.number_list.length+1)+'] / '+localDatas.listSize)
 		.ask('number','value','  - Enter number',{defaultValue:dat=>localDatas.number_list.length+1});
-	})
+	},v=>v.value);
 })
 
 .log(dat=>'\n-------- End of the prompt --------\n')

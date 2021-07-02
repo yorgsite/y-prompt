@@ -26,8 +26,8 @@ Ask your questions and process the result:
 	.start()
 	.then(function(datas){
 		// process the result
-		var answer=['Yes','No'][datas.response?1:0];
-		console.log('\n- anwser='+answer+'\n- data='+data);
+		var answer=['No','Yes'][datas.response?1:0];
+		console.log('\n- anwser='+answer+'\n- data='+JSON.stringify(datas));
 
 		// **** if y displays :
 		//- anwser=Yes

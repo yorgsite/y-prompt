@@ -389,9 +389,11 @@ YP.Prompter=function(parent){
 	- {Prompter} prompter : the prompter used to collect new questions.<br/>
 	- {object} datas : The current global datas.<br/>
 	- {object} localDatas : The local prompter datas.<br/>
+	@param {function(results)} [transform] : return the transformed results.<br/>
+	- {Array<object>} results : The list of loop data blocks.<br/>
 	@return {Prompter} the current prompter.
 	*/
-	this.askWhile=function(varName,condition,collector){
+	this.askWhile=function(varName,condition,collector,transform){
 		check.arg('askWhile','string','varName',varName);
 		check.arg('askWhile','function','condition',condition);
 		check.arg('askWhile','function','collector',collector);
@@ -399,7 +401,8 @@ YP.Prompter=function(parent){
 			b_type:'while',
 			varName:varName,
 			condition:condition,
-			collector:collector
+			collector:collector,
+			transform:typeof(transform)==='function'?transform:(v=>v)
 		};
 		collection.push(obj);
 		return this;
@@ -414,7 +417,7 @@ YP.Prompter=function(parent){
 	- {object} localDatas : The local prompter datas.<br/>
 	@return {Prompter} the current prompter.
 	*/
-	this.askLoop=function(varName,nbLoop,collector){
+	this.askLoop=function(varName,nbLoop,collector,transform){
 		check.arg('askLoop','string','varName',varName);
 		// check.arg('askLoop',['number','function'],'nbLoop',nbLoop);
 		check.arg('askLoop','function','collector',collector);
@@ -434,8 +437,8 @@ YP.Prompter=function(parent){
 		}
 		var lid=0;
 		return typeof(nbLoop)==='function'?
-			this.askWhile(varName,(dat,loc)=>nbLoop(dat,loc)>lid++,collector):
-			this.askWhile(varName,()=>nbLoop>lid++,collector);
+			this.askWhile(varName,(dat,loc)=>nbLoop(dat,loc)>lid++,collector,transform):
+			this.askWhile(varName,()=>nbLoop>lid++,collector,transform);
 	};
 	/**
 	Starts the prompt session.<br/>
@@ -526,7 +529,7 @@ YP.Session.Block=function(bridge,prompter,onDone,onFail,parentData){
 			obj.collector(subblock,bridge.datas,datas);
 			if(obj.b_type==='while'){
 				new YP.Session.Block(bridge,subblock,(dat)=>{
-					datas[obj.varName].push(dat);
+					datas[obj.varName].push(obj.transform(dat));
 					id--;
 					build.next();
 				},onFail,datas);
@@ -592,7 +595,7 @@ YP.Session.Line=function(bridge,obj,onDone,onFail){
 	build.message=function(){
 		msg=obj.message+'';
 		msg+=' '+_styl.varName(obj.varName)+'';
-		msg+=' '+_styl.type('{'+obj.type+'}');
+		msg+=' '+'{'+_styl.type(obj.type)+'}';
 		if(hasdef){
 			msg+=' '+_styl.defaultValue('(default='+dval+')');
 		}
